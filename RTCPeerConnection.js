@@ -408,4 +408,8 @@ export default class RTCPeerConnection extends EventTarget(PEER_CONNECTION_EVENT
     dataChannelIds.add(id);
     return new RTCDataChannel(this._peerConnectionId, label, dataChannelDict);
   }
+
+  sendDTMF(tone) {
+    WebRTCModule.peerConnectionSendDTMF(tone, this._peerConnectionId);
+  }
 }
