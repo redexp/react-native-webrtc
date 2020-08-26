@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 import android.util.Log;
 
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -320,6 +323,17 @@ public class WebRTCView extends ViewGroup {
             // The onFrameResolutionChanged method call executes on the
             // surfaceViewRenderer's render Thread.
             post(requestSurfaceViewRendererLayoutRunnable);
+
+            WritableMap event = Arguments.createMap();
+            event.putInt("width", this.frameWidth);
+            event.putInt("height", this.frameHeight);
+            event.putInt("rotation", this.frameRotation);
+            ReactContext reactContext = (ReactContext)getContext();
+            reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+                getId(),
+                "frameResolutionChanged",
+                event
+            );
         }
     }
 

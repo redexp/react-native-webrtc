@@ -72,6 +72,8 @@ typedef NS_ENUM(NSInteger, RTCVideoViewObjectFit) {
  */
 @property (nonatomic, strong) RTCVideoTrack *videoTrack;
 
+@property (nonatomic, copy) RCTBubblingEventBlock onFrameResolutionChanged;
+
 @end
 
 @implementation RTCVideoView {
@@ -115,15 +117,15 @@ typedef NS_ENUM(NSInteger, RTCVideoViewObjectFit) {
  */
 - (instancetype)initWithFrame:(CGRect)frame {
   if (self = [super initWithFrame:frame]) {
-#if defined(RTC_SUPPORTS_METAL)
+/* #if defined(RTC_SUPPORTS_METAL)
     RTCMTLVideoView *subview = [[RTCMTLVideoView alloc] initWithFrame:CGRectZero];
     subview.delegate = self;
     _videoView = subview;
-#else
+#else */
     RTCEAGLVideoView *subview = [[RTCEAGLVideoView alloc] initWithFrame:CGRectZero];
     subview.delegate = self;
     _videoView = subview;
-#endif
+// #endif
 
     _videoSize.height = 0;
     _videoSize.width = 0;
@@ -272,6 +274,13 @@ typedef NS_ENUM(NSInteger, RTCVideoViewObjectFit) {
     _videoSize = size;
     [self setNeedsLayout];
   }
+
+  if (videoView.onFrameResolutionChanged) {
+    videoView.onFrameResolutionChanged(@{
+      @"width": _videoSize.width,
+      @"height": _videoSize.height,
+    });
+  }
 }
 
 @end
@@ -291,6 +300,7 @@ RCT_EXPORT_MODULE()
 }
 
 RCT_EXPORT_VIEW_PROPERTY(mirror, BOOL)
+RCT_EXPORT_VIEW_PROPERTY(onFrameResolutionChanged, RCTBubblingEventBlock)
 
 /**
  * In the fashion of
